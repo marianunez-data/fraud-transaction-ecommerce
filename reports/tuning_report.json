@@ -1,0 +1,26 @@
+{
+  "champion": "LightGBM",
+  "best_f2_val": 0.7139023081052066,
+  "best_params": {
+    "n_estimators": 481.0,
+    "learning_rate": 0.029149529507242568,
+    "max_depth": 7.0,
+    "subsample": 0.8046622433355349,
+    "colsample_bytree": 0.6457076592009857,
+    "reg_alpha": 4.730422712649423,
+    "reg_lambda": 2.1604705509972458e-06,
+    "min_child_weight": 16.0,
+    "num_leaves": 150.0
+  },
+  "n_trials": 80,
+  "all_results": {
+    "CatBoost": {
+      "f2": 0.7035573122529645,
+      "trials": 80
+    },
+    "LightGBM": {
+      "f2": 0.7139023081052066,
+      "trials": 80
+    }
+  }
+}

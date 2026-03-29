@@ -5,7 +5,6 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://fraud-transaction-ecommerce.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![LightGBM](https://img.shields.io/badge/Model-LightGBM-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ---
 
@@ -185,8 +184,8 @@ The interactive dashboard includes:
 
 ```
 fraud-transaction-ecommerce/
-├── fraud_detection_ecommerce.ipynb    # Full analysis notebook (103 cells)
-├── fraud-prevention.csv               # Dataset (16,879 transactions)
+├── fraud_detection_ecommerce.ipynb   
+├── fraud-prevention.csv               # Dataset (16879 transactions)
 ├── models/
 │   ├── champion_baseline.pkl          # Pre-calibration LightGBM
 │   ├── champion_calibrated.pkl        # Isotonic-calibrated model

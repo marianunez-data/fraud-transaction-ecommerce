@@ -1,6 +1,6 @@
 # Fraud Detection in E-Commerce Transactions
 
-> End-to-end machine learning pipeline for identifying fraudulent transactions in a Latin American e-commerce platform. Built with production-grade practices: leakage-free preprocessing, Bayesian hyperparameter optimization, probability calibration, and business impact quantification.
+> End-to-end machine learning pipeline for identifying fraudulent transactions in e-commerce platform. Built with production-grade practices: leakage-free preprocessing, Bayesian hyperparameter optimization, probability calibration, and business impact quantification.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://fraud-transaction-ecommerce.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
@@ -102,7 +102,7 @@ Each analysis produced specific findings that directly motivated feature enginee
 
 **Validation**: 5 of the top 10 SHAP features are engineered — feature engineering adds measurable predictive value.
 
-### Modeling Pipeline — Zero Leakage
+### Modeling Pipeline
 
 1. **Split first** — 70/15/15 stratified before any fitted transforms
 2. **6 baselines** — DummyClassifier → LR → RF → XGBoost → LightGBM → CatBoost
@@ -269,11 +269,5 @@ streamlit run app.py
 ---
 
 ## Author
-
 **Maria Nunez** — Data Scientist
 
-[![GitHub](https://img.shields.io/badge/GitHub-marianunez--data-181717?logo=github)](https://github.com/marianunez-data)
-
----
-
-*Built as a portfolio project demonstrating end-to-end ML pipeline development with production-grade practices.*

@@ -1,7 +1,6 @@
 # Fraud Detection in E-Commerce Transactions
 
-> End-to-end machine learning pipeline for identifying fraudulent transactions in a Latin American e-commerce platform. Built with production-grade practices: leakage-free preprocessing, Bayesian hyperparameter optimization, probability calibration, and business impact quantification.
-
+> Machine learning pipeline for identifying fraudulent transactions in a Latin American e-commerce platform. Built with production-grade practices: leakage-free preprocessing, Bayesian hyperparameter optimization, probability calibration, and business impact quantification.
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://fraud-transaction-ecommerce.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![LightGBM](https://img.shields.io/badge/Model-LightGBM-green)

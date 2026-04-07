@@ -1,25 +1,25 @@
 {
   "champion": "LightGBM",
-  "best_f2_val": 0.7139023081052066,
+  "best_f2_val": 0.7133351077987756,
   "best_params": {
-    "n_estimators": 481.0,
-    "learning_rate": 0.029149529507242568,
-    "max_depth": 7.0,
-    "subsample": 0.8046622433355349,
-    "colsample_bytree": 0.6457076592009857,
-    "reg_alpha": 4.730422712649423,
-    "reg_lambda": 2.1604705509972458e-06,
-    "min_child_weight": 16.0,
-    "num_leaves": 150.0
+    "n_estimators": 419.0,
+    "learning_rate": 0.04852669358976857,
+    "max_depth": 4.0,
+    "subsample": 0.8003667779995849,
+    "colsample_bytree": 0.5497512893896768,
+    "reg_alpha": 4.816373222719408,
+    "reg_lambda": 1.0286257112560784,
+    "min_child_weight": 29.0,
+    "num_leaves": 47.0
   },
   "n_trials": 80,
   "all_results": {
     "CatBoost": {
-      "f2": 0.7035573122529645,
+      "f2": 0.7061534291135809,
       "trials": 80
     },
     "LightGBM": {
-      "f2": 0.7139023081052066,
+      "f2": 0.7133351077987756,
       "trials": 80
     }
   }

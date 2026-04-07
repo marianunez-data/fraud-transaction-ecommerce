@@ -43,9 +43,10 @@ with tab1:
 
     st.markdown("### Key Insights")
     st.markdown("""
-    - **`b_k_ratio`** is the #1 predictor — the engineered B/K interaction captures
-      the strongest fraud signal
-    - Geographic origin (`j_` features) ranks high — region is a critical risk factor
+    - **`j_j_mx`** is the #1 predictor — geographic origin (Mexico = low risk) is the
+      strongest fraud signal
+    - **`b_k_ratio`** ranks #2 — the engineered B/K interaction captures critical
+      non-linear fraud patterns
     - **5 of the top 10 features are engineered** — feature engineering from EDA
       adds measurable predictive value
     - **`cluster_id`** in top 10 — behavioral archetypes capture multi-feature patterns

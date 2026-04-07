@@ -13,14 +13,14 @@
 
 | Metric | Value |
 |--------|-------|
-| **F2-Score** (primary) | **0.7221** |
-| Recall (fraud detection rate) | 84.4% |
-| Precision (review efficiency) | 45.8% |
-| ROC-AUC | 0.8311 |
-| Net Savings | $74,311 per batch |
-| CV Stability (5-fold) | 0.6786 ± 0.0061 |
+| **F2-Score** (primary) | **0.7164** |
+| Recall (fraud detection rate) | 85.0% |
+| Precision (review efficiency) | 44.0% |
+| ROC-AUC | 0.8225 |
+| Net Savings | $74,308 per batch |
+| CV Stability (5-fold) | 0.6854 ± 0.0048 |
 
-**The model detects 84.4% of fraudulent transactions**, generating $74K+ in net savings per 2,532-transaction batch at a review cost of $7 per flag.
+**The model detects 85% of fraudulent transactions**, generating $74K+ in net savings per 2,532-transaction batch at a review cost of $7 per flag.
 
 ---
 
@@ -35,7 +35,7 @@ graph LR
     E --> F[6 Baseline Models]
     F --> G[Optuna Tuning<br/>Top 2 — 80 trials each]
     G --> H[5-Fold CV<br/>Stability check]
-    H --> I[Isotonic Calibration<br/>Brier −15.3%]
+    H --> I[Isotonic Calibration<br/>Brier −17.2%]
     I --> J[Threshold Optimization<br/>F2 + ROI sweep]
     J --> K[SHAP Explainability]
     K --> L[Business Impact<br/>$74K net savings]
@@ -106,10 +106,10 @@ Each analysis produced specific findings that directly motivated feature enginee
 
 1. **Split first** — 70/15/15 stratified before any fitted transforms
 2. **6 baselines** — DummyClassifier → LR → RF → XGBoost → LightGBM → CatBoost
-3. **Optuna tuning** — Top 2 models dynamically selected, 80 Bayesian trials each, F2 objective
-4. **5-fold CV** — Stability check (F2 = 0.6786 ± 0.0061)
-5. **Isotonic calibration** — Brier Score improved 15.3% (0.1586 → 0.1343)
-6. **Threshold optimization** — F2-optimal (θ=0.19) + ROI sweep on validation set
+3. **Optuna tuning** — Top 2 models dynamically selected, 80 Bayesian trials each, F2 objective, regularization-constrained search space (`num_leaves ≤ 64`, `reg ≥ 0.1`, `min_child ≥ 5`)
+4. **5-fold CV** — Stability check (F2 = 0.6854 ± 0.0048, Train-CV gap = 0.048)
+5. **Isotonic calibration** — Brier Score improved 17.2% (0.1643 → 0.1361)
+6. **Threshold optimization** — F2-optimal (θ=0.176) + ROI sweep on validation set
 7. **SHAP explainability** — Global importance, dependence plots, individual waterfalls
 
 ---
@@ -118,8 +118,8 @@ Each analysis produced specific findings that directly motivated feature enginee
 
 | Model | F2 | Recall | Precision | ROC-AUC |
 |-------|-----|--------|-----------|---------|
-| **LightGBM (tuned)** | **0.7139** | **76.9%** | **55.5%** | **0.841** |
-| CatBoost (tuned) | 0.7036 | — | — | — |
+| **LightGBM (tuned)** | **0.7133** | **76.4%** | **55.1%** | **0.832** |
+| CatBoost (tuned) | 0.7062 | — | — | — |
 | CatBoost (baseline) | 0.7063 | 75.3% | 56.6% | 0.843 |
 | LightGBM (baseline) | 0.6954 | 73.0% | 58.5% | 0.841 |
 | XGBoost | 0.6920 | 72.5% | 58.4% | 0.839 |
@@ -131,27 +131,27 @@ Each analysis produced specific findings that directly motivated feature enginee
 
 ## SHAP Feature Importance
 
-The top predictor is an **engineered feature** (`b_k_ratio`), confirming that EDA-driven feature engineering adds measurable value beyond the original anonymized columns.
+The top predictors are geographic risk (`j_j_mx`) and an **engineered feature** (`b_k_ratio`), confirming that both EDA-driven feature engineering and geographic analysis add measurable value beyond the original anonymized columns.
 
 ![SHAP Global Importance](reports/shap_global_bar.png)
 
 **Top 5 features:**
-1. `b_k_ratio` (0.35) — engineered B/K interaction ratio
-2. `j_j_mx` (0.33) — geographic signal (Mexico = low risk)
-3. `monto` (0.18) — transaction amount
-4. `b_k_interaction` (0.18) — engineered B×K product
-5. `s_k_interaction` (0.15) — engineered S×K product
+1. `j_j_mx` (0.32) — geographic signal (Mexico = low risk)
+2. `b_k_ratio` (0.31) — engineered B/K interaction ratio
+3. `monto` (0.16) — transaction amount
+4. `b_k_interaction` (0.16) — engineered B×K product
+5. `s` (0.15) — continuous feature S
 
 ---
 
 ## Business Impact
 
-| Scenario | Threshold | Net ROI | Recall | Flagged % |
-|----------|-----------|---------|--------|-----------|
-| Do Nothing | 1.00 | −$91,105 | 2.8% | 0.8% |
-| Default (0.50) | 0.50 | −$11,992 | 45.6% | 17.5% |
-| **F2-Optimal** | **0.19** | **+$55,186** | **84.4%** | **50.3%** |
-| ROI-Optimal | 0.05 | +$74,188 | 99.1% | 88.7% |
+| Scenario | Threshold | Net Savings | Recall | Flagged % |
+|----------|-----------|-------------|--------|-----------|
+| Do Nothing | — | −$96,255 | 0% | 0% |
+| Default (0.50) | 0.50 | varies | ~46% | ~18% |
+| **F2-Optimal** | **0.176** | **+$74,308** | **85.0%** | **52.6%** |
+| ROI-Optimal | 0.05 | varies | ~99% | ~89% |
 
 ---
 
@@ -175,6 +175,7 @@ The interactive dashboard includes:
 | F2 over F1 | Cost asymmetry: missed fraud ($50–100) >> false alarm review ($7) |
 | Isotonic calibration | Reliable probability estimates for threshold optimization and ROI |
 | Optuna over GridSearch | Bayesian TPE converges in 80 trials vs thousands of grid combinations |
+| Regularization-constrained search | `num_leaves ≤ 64`, `reg ≥ 0.1`, `min_child ≥ 5` — prevents overfitting on 11K rows (Train-CV gap = 0.048) |
 | Dynamic model selection | Top 2 by F2 selected automatically — reproducible, not hardcoded |
 | No PCA features | Trees do implicit feature selection; PCA destroys interpretability |
 | Cluster as feature | Captures multi-feature behavioral combinations, fit on train only |
@@ -185,7 +186,7 @@ The interactive dashboard includes:
 
 ```
 fraud-transaction-ecommerce/
-├── fraud_detection_ecommerce.ipynb    # Full analysis notebook (103 cells)
+├── fraud_detection_ecommerce.ipynb    # Full analysis notebook
 ├── fraud-prevention.csv               # Dataset (16,879 transactions)
 ├── models/
 │   ├── champion_baseline.pkl          # Pre-calibration LightGBM
@@ -255,9 +256,9 @@ streamlit run app.py
 
 1. **Anonymized features** limit domain-specific interpretation and stakeholder communication
 2. **Geographic concentration** (95.5% Latin America) — model may not generalize to other markets
-3. **Overfitting gap** — Train-CV F2 gap of 0.10; fix: constrain `num_leaves ≤ 64` and increase regularization
-4. **Static evaluation** — production requires continuous drift monitoring (Evidently AI)
-5. **No temporal features** — transaction sequence and velocity patterns unavailable
+3. **Static evaluation** — production requires continuous drift monitoring (Evidently AI)
+4. **No temporal features** — transaction sequence and velocity patterns unavailable
+5. **Dataset size** (16,879 rows) limits deep learning approaches
 
 ### Production Roadmap
 1. FastAPI real-time inference endpoint (<100ms latency)

@@ -25,7 +25,7 @@ friction_cost = st.sidebar.slider("Customer Friction Cost ($)", 0, 20, 3)
 capacity_pct = st.sidebar.slider("Max Review Capacity (%)", 10, 100, 50, step=5)
 
 st.sidebar.markdown("### Decision Threshold")
-threshold = st.sidebar.slider("Classification Threshold", 0.05, 0.95, 0.19, step=0.01)
+threshold = st.sidebar.slider("Classification Threshold", 0.05, 0.95, 0.176, step=0.01)
 
 # --- COMPUTE METRICS AT CURRENT THRESHOLD ---
 y_pred = (y_proba >= threshold).astype(int)
@@ -119,7 +119,7 @@ st.markdown("### Scenario Comparison")
 scenarios = []
 for label, theta in [("Do Nothing", 1.0), ("Default (0.50)", 0.50),
                       (f"Current ({threshold:.2f})", threshold),
-                      ("F2-Optimal (0.19)", 0.19)]:
+                      ("F2-Optimal (0.176)", 0.176)]:
     yp = (y_proba >= theta).astype(int)
     tn_s, fp_s, fn_s, tp_s = confusion_matrix(y_true, yp).ravel()
     roi_s = (tp_s * (avg_fraud_amount - review_cost)

@@ -34,7 +34,7 @@ st.markdown("### Baseline Model Comparison")
 st.info(
     "**Note**: The table below shows **baseline** results (default hyperparameters, threshold = 0.5). "
     "The champion metrics above reflect the **final** model after Optuna tuning, "
-    "Isotonic calibration, and F2-optimized threshold (0.19)."
+    "Isotonic calibration, and F2-optimized threshold."
 )
 
 st.caption("All 6 models evaluated on validation set, sorted by F2-Score (primary metric)")
@@ -55,7 +55,7 @@ st.markdown("""
 > **Key takeaways**:
 > - **CatBoost** and **LightGBM** lead in F2-Score at baseline
 > - Both advanced to Optuna tuning (80 trials each)
-> - **LightGBM** won the tuning phase with F2 = 0.7139 (val)
+> - **LightGBM** won the tuning phase with F2 = 0.7133 (val)
 > - **DummyClassifier** (F2 = 0.2907) establishes the absolute floor
 """)
 
@@ -65,14 +65,14 @@ st.caption("How LightGBM improved through each pipeline stage")
 
 progression = pd.DataFrame([
     {"Stage": "Baseline (default params, threshold=0.5)", "F2 (Val)": 0.6954, "F2 (Test)": "—"},
-    {"Stage": "Optuna-Tuned (80 trials)", "F2 (Val)": 0.7139, "F2 (Test)": "—"},
-    {"Stage": "Tuned + Isotonic Calibration + F2 Threshold (0.19)", "F2 (Val)": "—", "F2 (Test)": "0.7221"},
+    {"Stage": "Optuna-Tuned (80 trials, regularized)", "F2 (Val)": 0.7133, "F2 (Test)": "—"},
+    {"Stage": "Tuned + Isotonic Calibration + F2 Threshold", "F2 (Val)": "—", "F2 (Test)": f"{metrics['F2']:.4f}"},
 ])
 st.dataframe(progression, use_container_width=True, hide_index=True)
 
-st.markdown("""
-> **Improvement**: Baseline F2 0.6954 → Final F2 **0.7221** (+0.0267).
-> Each stage contributed: tuning (+0.0185 on val), calibration + threshold optimization (test gain).
+st.markdown(f"""
+> **Improvement**: Baseline F2 0.6954 → Final F2 **{metrics['F2']:.4f}** (+{metrics['F2'] - 0.6954:.4f}).
+> Each stage contributed: tuning (+0.0179 on val), calibration + threshold optimization (test gain).
 """)
 
 st.markdown("---")
@@ -81,15 +81,16 @@ st.markdown("---")
 st.markdown("### Generalization: CV vs Validation vs Test")
 
 gen_data = pd.DataFrame([
-    {"Set": "CV (5-fold)", "F2": 0.6786, "Note": "Ground truth (5-fold mean)"},
-    {"Set": "Validation", "F2": 0.7139, "Note": "Used for tuning + threshold"},
-    {"Set": "Test", "F2": 0.7221, "Note": "First and only look"},
+    {"Set": "CV (5-fold)", "F2": 0.6854, "Note": "Ground truth (5-fold mean)"},
+    {"Set": "Validation", "F2": 0.7133, "Note": "Used for tuning + threshold"},
+    {"Set": "Test", "F2": metrics["F2"], "Note": "First and only look"},
 ])
 st.dataframe(gen_data, use_container_width=True, hide_index=True)
 
-st.markdown("""
-> Test F2 (0.7221) exceeds CV range — favorable variance in the test split,
+st.markdown(f"""
+> Test F2 ({metrics['F2']:.4f}) exceeds CV range — favorable variance in the test split,
 > not a pipeline issue. Both CV and test confirm generalization.
+> Train-CV gap of 0.048 indicates healthy generalization.
 """)
 
 st.markdown("---")
@@ -98,39 +99,28 @@ st.markdown("---")
 st.markdown("### Probability Calibration")
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Raw Brier", "0.1586")
-col2.metric("Isotonic Brier", "0.1343", delta="-15.3%", delta_color="inverse")
+col1.metric("Raw Brier", "0.1643")
+col2.metric("Isotonic Brier", "0.1361", delta="-17.2%", delta_color="inverse")
 col3.metric("Test Brier", f"{metrics['Brier']:.4f}")
 
 st.markdown("""
-> **Isotonic calibration** reduced the Brier Score by 15.3%, ensuring that
+> **Isotonic calibration** reduced the Brier Score by 17.2%, ensuring that
 > probability outputs are trustworthy for threshold optimization and business decisions.
 """)
 
 st.markdown("---")
 
-# --- 5. Overfitting Note ---
-st.markdown("### Overfitting Analysis")
-
-st.warning("""
-**Train-CV gap: 0.10** — The model (num_leaves=150, max_depth=7) has enough capacity
-to partially memorize training patterns on this 16K-row dataset.
-
-**Root cause**: High num_leaves with moderate depth gives excessive flexibility.
-
-**Production fix**: Constrain Optuna search space to `num_leaves <= 64` and increase
-`reg_alpha` bounds to enforce stronger regularization.
-
-**Impact**: The test F2 (0.7221) confirms generalization despite the gap. The model
-works — but a tighter regularization would yield a more robust deployment.
-""")
-
-# --- 6. Tuning Details ---
+# --- 5. Tuning Details ---
 st.markdown("### Optuna Hyperparameters")
-st.caption(f"{tuning['n_trials']} Bayesian trials (TPE sampler)")
+st.caption(f"{tuning['n_trials']} Bayesian trials (TPE sampler) | Regularization-constrained search space")
 
 params_df = pd.DataFrame([
     {"Parameter": k, "Value": f"{v:.6f}" if isinstance(v, float) else str(v)}
     for k, v in tuning["best_params"].items()
 ])
 st.dataframe(params_df, use_container_width=True, hide_index=True)
+
+st.markdown("""
+> **Search space constraints**: `num_leaves ≤ 64`, `reg_alpha/lambda ≥ 0.1`, `min_child_weight ≥ 5`.
+> These bounds prevent overfitting on the 11K-row training set while preserving generalization.
+""")

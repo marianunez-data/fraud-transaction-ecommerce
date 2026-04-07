@@ -36,10 +36,10 @@ transactions to identify fraudulent activity. The model was tuned with Optuna
 
 # Key metrics row
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("F2-Score", "0.7221", help="Primary metric — recall-weighted")
-col2.metric("Recall", "84.4%", help="Fraud detection rate")
-col3.metric("Precision", "45.8%", help="Review efficiency")
-col4.metric("Net Savings", "$59,282", help="Per test batch (2,532 transactions)")
+col1.metric("F2-Score", "0.7164", help="Primary metric — recall-weighted")
+col2.metric("Recall", "85.0%", help="Fraud detection rate")
+col3.metric("Precision", "44.0%", help="Review efficiency")
+col4.metric("Net Savings", "$74,308", help="Per test batch (2,532 transactions)")
 
 st.markdown("---")
 
